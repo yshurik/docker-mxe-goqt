@@ -1,0 +1,30 @@
+FROM yshurik/mxe-qt:debian-based-1
+MAINTAINER yshurik <yshurik@gmail.com>
+
+ENV CGO_CFLAGS_ALLOW ".*"
+ENV CGO_CXXFLAGS_ALLOW ".*"
+ENV CGO_LDFLAGS_ALLOW ".*"
+
+ENV PATH "/mxe/usr/bin:/mxe/usr/x86_64-w64-mingw32.shared/qt5:/mxe/usr/x86_64-w64-mingw32.shared/qt5/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+ENV PKG_CONFIG "/mxe/usr/bin/x86_64-w64-mingw32.shared-pkg-config"
+
+ENV QT_DOCKER "true"
+ENV QT_FAT "true"
+ENV QT_MXE "true"
+ENV QT_MXE_ARCH "amd64"
+ENV QT_MXE_DIR "/mxe"
+ENV QT_MXE_STATIC "false"
+ENV QT_DIR "/qt"
+ENV mxedir "/mxe/"
+ENV GOPATH "/go"
+
+RUN go get -u -v github.com/therecipe/qt/cmd/...
+
+RUN QTVER="$(qmake -v | grep Qt | awk '{ print $4 }')" && mkdir -p /qt/$QTVER/ && ln -s /mxe/usr/x86_64-w64-mingw32.shared/qt5 /qt/$QTVER/gcc_64
+RUN ls -la /qt && ls -la /qt/*/
+RUN qtsetup check windows
+RUN qtsetup generate windows
+RUN qtsetup install windows
+
+
